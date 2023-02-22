@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 30ed97998b1403347a1867a4f0e4b554
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - UnknowTile: {fileID: 11400000, guid: d1eebb40df7e3b54a90602a79595d893, type: 2}
+  - Bomb: {fileID: 11400000, guid: 71e2d64170dee1b429198a919ef90545, type: 2}
+  - FlaggedTile: {fileID: 11400000, guid: be995c404c31dd645baddc17a26c9306, type: 2}
+  - one: {fileID: 11400000, guid: 4722e6468decf4b4281de046c505f616, type: 2}
+  - two: {fileID: 11400000, guid: b8ec61274b39a474a9352dd0ac6f3913, type: 2}
+  - three: {fileID: 11400000, guid: 7052d4e82fd14d54589ad333f6e66c63, type: 2}
+  - four: {fileID: 11400000, guid: 11ab0eb2ccbe2f2488fa319e9f0df408, type: 2}
+  - noNum: {fileID: 11400000, guid: f94d0b6043e61584fab4bf2627be25db, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
