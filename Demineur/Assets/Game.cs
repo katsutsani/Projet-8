@@ -12,6 +12,8 @@ public class Game : MonoBehaviour
     private GameBoard gameBoard;
     private GameCells[,] gameCells;
 
+    private bool gameOver;
+
     private void Awake()
     {
         gameBoard = GetComponentInChildren<GameBoard>();
@@ -25,6 +27,7 @@ public class Game : MonoBehaviour
 
     private void NewGame()
     {
+        gameOver = false;
         gameCells = new GameCells[width, height];
 
         GenerateCells();
@@ -90,7 +93,6 @@ public class Game : MonoBehaviour
                 {
                     gameCell.type= GameCells.Type.Number;
                 }
-                gameCell.revealed= true;
                 gameCells[x, y] = gameCell;
             }
         }
@@ -114,7 +116,7 @@ public class Game : MonoBehaviour
                 {
                     continue;
                 }
-                if (gameCells[x,y].type == GameCells.Type.Mine)
+                if (GetCell(x,y).type == GameCells.Type.Mine)
                 {
                     count++;
                 }
@@ -124,29 +126,162 @@ public class Game : MonoBehaviour
     }
 
     // Update is called once per frame
-    //void Update()
-    //{
-    //    if (Input.GetMouseButtonDown(1))
-    //    {
-    //        flag();
-    //    }
-    //    else if (Input.GetMouseButtonDown(0))
-    //    {
-    //        RemoveTile();
-    //    }
-    //}
+    void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            NewGame();
+        }
+        else if (!gameOver)
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                flag();
+            }
+            else if (Input.GetMouseButtonDown(0))
+            {
+                RemoveTile();
+            }
+        }
+        
+    }
 
-    //private void flag()
-    //{
-    //    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    //    Instantiate(prefab2, new Vector2(worldPosition.x, worldPosition.y), Quaternion.identity);
-    //}
+    private void flag()
+    {
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 gameCellPosition = gameBoard.tilemap.WorldToCell(worldPosition);
+        GameCells gameCell = GetCell((int)gameCellPosition.x, (int)gameCellPosition.y);
 
-    //private void RemoveTile()
-    //{
-    //    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-    //    Instantiate(prefab2, new Vector2(worldPosition.x, worldPosition.y), Quaternion.identity);
-    //}
+        if(gameCell.type == GameCells.Type.Invalid || gameCell.revealed)
+        {
+            return;
+        }
+        gameCell.flagged = !gameCell.flagged;
+        gameCells[(int)gameCellPosition.x, (int)gameCellPosition.y] = gameCell;
+        gameBoard.DrawMap(gameCells);
+    }
+
+    private GameCells GetCell(int x, int y)
+    {
+        if (isValid(x, y))
+        {
+            return gameCells[x,y];
+        }
+        else
+        {
+            return new GameCells();
+        }
+    }
+
+    private bool isValid(int x, int y)
+    {
+        return x>=0 && x < width && y >= 0 && y<height;
+    }
+
+    private void RemoveTile()
+    {
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 gameCellPosition = gameBoard.tilemap.WorldToCell(worldPosition);
+        GameCells gameCell = GetCell((int)gameCellPosition.x, (int)gameCellPosition.y);
+
+        if (gameCell.type == GameCells.Type.Invalid || gameCell.revealed || gameCell.flagged)
+        {
+            return;
+        }
+
+        switch (gameCell.type)
+        {
+            case GameCells.Type.Empty:
+                Flood(gameCell);
+                CheckWinCond();
+                break;
+            case GameCells.Type.Mine:
+                Lose(gameCell);
+                break;
+            default:
+                gameCell.revealed = true;
+                gameCells[(int)gameCellPosition.x, (int)gameCellPosition.y] = gameCell;
+                CheckWinCond();
+                break;
+        }
+
+        if(gameCell.type == GameCells.Type.Empty)
+        {
+            Flood(gameCell);
+        }
+      
+        gameBoard.DrawMap(gameCells);
+    }
+
+    private void CheckWinCond()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                GameCells gameCell = gameCells[x, y];
+                if(gameCell.type != GameCells.Type.Mine && !gameCell.revealed)
+                {
+                    return;
+                }
+            }
+        }
+        Debug.Log("You Won !");
+        gameOver = true;
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                GameCells gameCell = gameCells[x, y];
+                if (gameCell.type == GameCells.Type.Mine)
+                {
+                    gameCell.revealed = true;
+                    gameCells[x, y] = gameCell;
+                }
+            }
+        }
+    }
+
+    private void Lose(GameCells gameCell)
+    {
+        Debug.Log("Game Over !");
+        gameOver = true;
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                gameCell = gameCells[x, y];
+                if(gameCell.type == GameCells.Type.Mine)
+                {
+                    gameCell.revealed = true;
+                    gameCells[x,y] = gameCell;
+                }
+            }
+        }
+    }
+
+    private void Flood(GameCells gameCell)
+    {
+        if (gameCell.revealed)
+        {
+            return;
+        }
+        if(gameCell.type == GameCells.Type.Mine || gameCell.type == GameCells.Type.Invalid)
+        {
+            return;
+        }
+
+        gameCell.revealed = true;
+        gameCells[gameCell.position.x,gameCell.position.y] = gameCell;
+
+        if(gameCell.type == GameCells.Type.Empty) 
+        {
+            Flood(GetCell(gameCell.position.x-1,gameCell.position.y));
+            Flood(GetCell(gameCell.position.x + 1, gameCell.position.y));
+            Flood(GetCell(gameCell.position.x, gameCell.position.y - 1));
+            Flood(GetCell(gameCell.position.x, gameCell.position.y + 1));
+        }
+    }
 
     //private bool isATile(int x, int y)
     //{

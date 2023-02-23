@@ -6,6 +6,7 @@ public struct GameCells
 {
     public enum Type
     {
+        Invalid,
         Empty,
         Mine,
         Number,
