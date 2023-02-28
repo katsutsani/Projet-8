@@ -5,9 +5,8 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
-    public int width = 16;
-    public int height = 16;
-    public int MineCount = 32; 
+    public int size = 16;
+    public int MineCount; 
 
     private GameBoard gameBoard;
     private GameCells[,] gameCells;
@@ -21,6 +20,7 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        MineCount = size * 2;
         NewGame();
         
     }
@@ -28,21 +28,21 @@ public class Game : MonoBehaviour
     private void NewGame()
     {
         gameOver = false;
-        gameCells = new GameCells[width, height];
+        gameCells = new GameCells[size, size];
 
         GenerateCells();
         GenerateMines();
         GenerateNumbers();
 
-        Camera.main.transform.position = new Vector3(width/2f, height/2f, -10f);
+        Camera.main.transform.position = new Vector3(size/2f, size/2f, -10f);
         gameBoard.DrawMap(gameCells);
     }
 
     private void GenerateCells()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < size; y++)
             {
                 GameCells gameCell = new GameCells();
                 gameCell.position = new Vector3Int(x, y,0);
@@ -56,17 +56,17 @@ public class Game : MonoBehaviour
     {
         for (int i = 0; i < MineCount; i++)
         {
-            int x = Random.Range(0, width);
-            int y = Random.Range(0, height);
+            int x = Random.Range(0, size);
+            int y = Random.Range(0, size);
 
             while(gameCells[x, y].type == GameCells.Type.Mine)
             {
                 x++;
-                if(x >= width)
+                if(x >= size)
                 {
                     x = 0;
                     y++;
-                    if(y>=height)
+                    if(y>=size)
                     {
                         y = 0;
                     }
@@ -78,9 +78,9 @@ public class Game : MonoBehaviour
 
     private void GenerateNumbers()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < size; y++)
             {
                 GameCells gameCell = gameCells[x,y];
                 if(gameCell.type == GameCells.Type.Mine)
@@ -112,7 +112,7 @@ public class Game : MonoBehaviour
                 int x = cellX + adjacentX;
                 int y = cellY + adjacentY;
 
-                if(x<0 || x >= width || y < 0 || y>= height)
+                if(x<0 || x >= size || y < 0 || y>= size)
                 {
                     continue;
                 }
@@ -175,7 +175,7 @@ public class Game : MonoBehaviour
 
     private bool isValid(int x, int y)
     {
-        return x>=0 && x < width && y >= 0 && y<height;
+        return x>=0 && x < size && y >= 0 && y<size;
     }
 
     private void RemoveTile()
@@ -215,9 +215,9 @@ public class Game : MonoBehaviour
 
     private void CheckWinCond()
     {
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < size; y++)
             {
                 GameCells gameCell = gameCells[x, y];
                 if(gameCell.type != GameCells.Type.Mine && !gameCell.revealed)
@@ -228,9 +228,9 @@ public class Game : MonoBehaviour
         }
         Debug.Log("You Won !");
         gameOver = true;
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < size; y++)
             {
                 GameCells gameCell = gameCells[x, y];
                 if (gameCell.type == GameCells.Type.Mine)
@@ -246,9 +246,9 @@ public class Game : MonoBehaviour
     {
         Debug.Log("Game Over !");
         gameOver = true;
-        for (int x = 0; x < width; x++)
+        for (int x = 0; x < size; x++)
         {
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < size; y++)
             {
                 gameCell = gameCells[x, y];
                 if(gameCell.type == GameCells.Type.Mine)
