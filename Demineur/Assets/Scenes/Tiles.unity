@@ -474,6 +474,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e294cf17ab0a7447aa5f9c629eea0bb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 16
-  height: 16
-  MineCount: 32
+  size: 14
+  MineCount: 0
