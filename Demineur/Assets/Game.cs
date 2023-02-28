@@ -10,7 +10,7 @@ public class Game : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI textTime;
 
-    [SerializeField] float currentTime = 0;
+    [SerializeField] float currentTime;
     [SerializeField] bool timerIsRunning = false;
     private bool isFirstClick;
 
@@ -72,6 +72,7 @@ public class Game : MonoBehaviour
 
     private void NewGame()
     {
+        currentTime = 0;
         isFirstClick = true;
         gameOver = false;
         gameCells = new GameCells[size, size];
