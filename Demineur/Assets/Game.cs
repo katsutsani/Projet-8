@@ -1,10 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
+
 public class Game : MonoBehaviour
 {
+    [SerializeField] TextMeshProUGUI textTime;
+
+    [SerializeField] float currentTime = 0;
+    [SerializeField] bool timerIsRunning = false;
+
+    [SerializeField] float milliSeconds;
+    [SerializeField] float minutes;
+    [SerializeField] float seconds;
+
     public int size = 16;
     public int MineCount; 
 
@@ -13,6 +24,8 @@ public class Game : MonoBehaviour
 
     private bool gameOver;
 
+    public bool GameOver { get => gameOver;}
+
     private void Awake()
     {
         gameBoard = GetComponentInChildren<GameBoard>();
@@ -20,9 +33,19 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        // Starts the timer automatically
+        timerIsRunning = true;
+
         MineCount = size * 2;
         NewGame();
-        
+    }
+
+    public void DisplayTime(float timeToDisplay)
+    {
+        minutes = Mathf.FloorToInt(currentTime / 60);
+        seconds = Mathf.FloorToInt(currentTime % 60);
+        milliSeconds = (timeToDisplay % 1) * 1000;
+        textTime.text = string.Format("Tema kom t lent : {0:00}:{1:00}:{2:000}", minutes, seconds, milliSeconds);
     }
 
     private void NewGame()
@@ -128,6 +151,18 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // timer
+        if (gameOver)
+        {
+            Debug.Log("The time is ...");
+            timerIsRunning = false;
+        }
+        else
+        {
+            DisplayTime(currentTime);
+            currentTime += Time.deltaTime;
+        }
+
         if (Input.GetKeyDown(KeyCode.R))
         {
             NewGame();
