@@ -15,8 +15,6 @@ public class Game : MonoBehaviour
     [SerializeField] bool timerIsRunning = false;
     private bool isFirstClick;
 
-    private bool isFirstClick;
-
     [SerializeField] float milliSeconds;
     [SerializeField] float minutes;
     [SerializeField] float seconds;
