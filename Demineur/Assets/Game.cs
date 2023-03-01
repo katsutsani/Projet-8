@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,9 +10,10 @@ using UnityEngine.SceneManagement;
 public class Game : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI textTime;
-
-    [SerializeField] float currentTime = 0;
+    [SerializeField] float currentTime;
+    [SerializeField] float timeRemaning;
     [SerializeField] bool timerIsRunning = false;
+    private bool isFirstClick;
 
     private bool isFirstClick;
 
@@ -19,8 +21,8 @@ public class Game : MonoBehaviour
     [SerializeField] float minutes;
     [SerializeField] float seconds;
 
-    public int size = 16;
-    public int MineCount; 
+    public int size;
+    public int MineCount;
 
     private GameBoard gameBoard;
     private GameCells[,] gameCells;
@@ -77,12 +79,17 @@ public class Game : MonoBehaviour
         NewGame();
     }
 
+    public void Difficulty()
+    {
+
+    }
+
     public void DisplayTime(float timeToDisplay)
     {
         minutes = Mathf.FloorToInt(currentTime / 60);
         seconds = Mathf.FloorToInt(currentTime % 60);
         milliSeconds = (timeToDisplay % 1) * 1000;
-        textTime.text = string.Format("Tema kom t lent : {0:00}:{1:00}:{2:000}", minutes, seconds, milliSeconds);
+        textTime.text = string.Format("Timer : \n{0:00}:{1:00}:{2:000}", minutes, seconds, milliSeconds);
     }
 
     private void NewGame()
@@ -95,7 +102,7 @@ public class Game : MonoBehaviour
         GenerateMines();
         GenerateNumbers();
 
-        Camera.main.transform.position = new Vector3(size/2f, size/2f, -10f);
+        Camera.main.transform.position = new Vector3(size / 2f, size / 2f, -10f);
         gameBoard.DrawMap(gameCells);
     }
 
@@ -106,7 +113,7 @@ public class Game : MonoBehaviour
             for (int y = 0; y < size; y++)
             {
                 GameCells gameCell = new GameCells();
-                gameCell.position = new Vector3Int(x, y,0);
+                gameCell.position = new Vector3Int(x, y, 0);
                 gameCell.type = GameCells.Type.Empty;
                 gameCells[x, y] = gameCell;
             }
@@ -120,14 +127,14 @@ public class Game : MonoBehaviour
             int x = Random.Range(0, size);
             int y = Random.Range(0, size);
 
-            while(gameCells[x, y].type == GameCells.Type.Mine)
+            while (gameCells[x, y].type == GameCells.Type.Mine)
             {
                 x++;
-                if(x >= size)
+                if (x >= size)
                 {
                     x = 0;
                     y++;
-                    if(y>=size)
+                    if (y >= size)
                     {
                         y = 0;
                     }
@@ -143,41 +150,41 @@ public class Game : MonoBehaviour
         {
             for (int y = 0; y < size; y++)
             {
-                GameCells gameCell = gameCells[x,y];
-                if(gameCell.type == GameCells.Type.Mine)
+                GameCells gameCell = gameCells[x, y];
+                if (gameCell.type == GameCells.Type.Mine)
                 {
                     continue;
                 }
-                gameCell.number = CountMines(x,y);
+                gameCell.number = CountMines(x, y);
 
-                if(gameCell.number > 0)
+                if (gameCell.number > 0)
                 {
-                    gameCell.type= GameCells.Type.Number;
+                    gameCell.type = GameCells.Type.Number;
                 }
                 gameCells[x, y] = gameCell;
             }
         }
     }
 
-    private int CountMines(int cellX,int cellY)
+    private int CountMines(int cellX, int cellY)
     {
         int count = 0;
-        for (int adjacentX = -1; adjacentX <=1; adjacentX++)
+        for (int adjacentX = -1; adjacentX <= 1; adjacentX++)
         {
-            for (int adjacentY = -1; adjacentY <=1; adjacentY++)
+            for (int adjacentY = -1; adjacentY <= 1; adjacentY++)
             {
-                if(adjacentX == 0 && adjacentY == 0)
+                if (adjacentX == 0 && adjacentY == 0)
                 {
                     continue;
                 }
                 int x = cellX + adjacentX;
                 int y = cellY + adjacentY;
 
-                if(x<0 || x >= size || y < 0 || y>= size)
+                if (x < 0 || x >= size || y < 0 || y >= size)
                 {
                     continue;
                 }
-                if (GetCell(x,y).type == GameCells.Type.Mine)
+                if (GetCell(x, y).type == GameCells.Type.Mine)
                 {
                     count++;
                 }
@@ -189,17 +196,6 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // timer
-        if (gameOver)
-        {
-            Debug.Log("The time is ...");
-            timerIsRunning = false;
-        }
-        else
-        {
-            DisplayTime(currentTime);
-            currentTime += Time.deltaTime;
-        }
 
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -218,7 +214,7 @@ public class Game : MonoBehaviour
                 if (currentTime <= 0)
                 {
                     gameOver= true;
-                    /*textTime.text = "Temps écoulé";*/
+                    /*textTime.text = "Temps ï¿½coulï¿½";*/
                     Debug.Log("Time Over");
                 }
                 else
@@ -233,10 +229,18 @@ public class Game : MonoBehaviour
             }
             else if (Input.GetMouseButtonDown(0))
             {
-                RemoveTile();
+                if (isFirstClick)
+                {
+                    CheckFirstClick();
+                    isFirstClick = false;
+
+                }
+                else
+                {
+                    RemoveTile();
+                }
             }
         }
-
         else
         {
             Debug.Log("The time is ...");
@@ -272,7 +276,7 @@ public class Game : MonoBehaviour
         Vector3 gameCellPosition = gameBoard.tilemap.WorldToCell(worldPosition);
         GameCells gameCell = GetCell((int)gameCellPosition.x, (int)gameCellPosition.y);
 
-        if(gameCell.type == GameCells.Type.Invalid || gameCell.revealed)
+        if (gameCell.type == GameCells.Type.Invalid || gameCell.revealed)
         {
             return;
         }
@@ -285,7 +289,7 @@ public class Game : MonoBehaviour
     {
         if (isValid(x, y))
         {
-            return gameCells[x,y];
+            return gameCells[x, y];
         }
         else
         {
@@ -295,7 +299,7 @@ public class Game : MonoBehaviour
 
     private bool isValid(int x, int y)
     {
-        return x>=0 && x < size && y >= 0 && y<size;
+        return x >= 0 && x < size && y >= 0 && y < size;
     }
 
     private void RemoveTile()
@@ -325,11 +329,11 @@ public class Game : MonoBehaviour
                 break;
         }
 
-        if(gameCell.type == GameCells.Type.Empty)
+        if (gameCell.type == GameCells.Type.Empty)
         {
             Flood(gameCell);
         }
-      
+
         gameBoard.DrawMap(gameCells);
     }
 
@@ -340,7 +344,7 @@ public class Game : MonoBehaviour
             for (int y = 0; y < size; y++)
             {
                 GameCells gameCell = gameCells[x, y];
-                if(gameCell.type != GameCells.Type.Mine && !gameCell.revealed)
+                if (gameCell.type != GameCells.Type.Mine && !gameCell.revealed)
                 {
                     return;
                 }
@@ -371,10 +375,10 @@ public class Game : MonoBehaviour
             for (int y = 0; y < size; y++)
             {
                 gameCell = gameCells[x, y];
-                if(gameCell.type == GameCells.Type.Mine)
+                if (gameCell.type == GameCells.Type.Mine)
                 {
                     gameCell.revealed = true;
-                    gameCells[x,y] = gameCell;
+                    gameCells[x, y] = gameCell;
                 }
             }
         }
@@ -386,17 +390,17 @@ public class Game : MonoBehaviour
         {
             return;
         }
-        if(gameCell.type == GameCells.Type.Mine || gameCell.type == GameCells.Type.Invalid)
+        if (gameCell.type == GameCells.Type.Mine || gameCell.type == GameCells.Type.Invalid)
         {
             return;
         }
 
         gameCell.revealed = true;
-        gameCells[gameCell.position.x,gameCell.position.y] = gameCell;
+        gameCells[gameCell.position.x, gameCell.position.y] = gameCell;
 
-        if(gameCell.type == GameCells.Type.Empty) 
+        if (gameCell.type == GameCells.Type.Empty)
         {
-            Flood(GetCell(gameCell.position.x-1,gameCell.position.y));
+            Flood(GetCell(gameCell.position.x - 1, gameCell.position.y));
             Flood(GetCell(gameCell.position.x + 1, gameCell.position.y));
             Flood(GetCell(gameCell.position.x, gameCell.position.y - 1));
             Flood(GetCell(gameCell.position.x, gameCell.position.y + 1));
