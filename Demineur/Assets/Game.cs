@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class Game : MonoBehaviour
@@ -11,6 +12,8 @@ public class Game : MonoBehaviour
 
     [SerializeField] float currentTime = 0;
     [SerializeField] bool timerIsRunning = false;
+
+    private bool isFirstClick;
 
     [SerializeField] float milliSeconds;
     [SerializeField] float minutes;
@@ -23,8 +26,26 @@ public class Game : MonoBehaviour
     private GameCells[,] gameCells;
 
     private bool gameOver;
+    public bool GameOver { get => gameOver; }
 
-    public bool GameOver { get => gameOver;}
+    private GameMode gameMode;
+
+    public void GoBack()
+    {
+         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+
+    private void ChoiceMod()
+    {
+        if (PlayerPrefs.GetInt("Mode") == 0)
+        {
+            currentTime = 0;
+        }
+        else if (PlayerPrefs.GetInt("Mode") == 1)
+        {
+            currentTime = 5;
+        }
+    }
 
     private void Awake()
     {
@@ -33,10 +54,26 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        // Starts the timer automatically
-        timerIsRunning = true;
-
-        MineCount = size * 2;
+        switch (PlayerPrefs.GetString("Difficulty"))
+        {
+            case "Easy":
+                size = 9;
+                MineCount = 10;
+                ChoiceMod();
+                break;
+            case "Medium":
+                size = 16;
+                MineCount = 40;
+                ChoiceMod();
+                break;
+            case "Hard":
+                size = 20;
+                MineCount = 99;
+                ChoiceMod();
+                break;
+            default:
+                break;
+        }
         NewGame();
     }
 
@@ -50,6 +87,7 @@ public class Game : MonoBehaviour
 
     private void NewGame()
     {
+        isFirstClick = true;
         gameOver = false;
         gameCells = new GameCells[size, size];
 
@@ -169,6 +207,26 @@ public class Game : MonoBehaviour
         }
         else if (!gameOver)
         {
+            DisplayTime(currentTime);
+
+            if (PlayerPrefs.GetInt("Mode") == 0)
+            {
+                currentTime += Time.deltaTime;
+            }
+            else if (PlayerPrefs.GetInt("Mode") == 1)
+            {
+                if (currentTime <= 0)
+                {
+                    gameOver= true;
+                    /*textTime.text = "Temps écoulé";*/
+                    Debug.Log("Time Over");
+                }
+                else
+                {
+                    currentTime -= Time.deltaTime;
+                }
+            }
+
             if (Input.GetMouseButtonDown(1))
             {
                 flag();
@@ -178,7 +236,34 @@ public class Game : MonoBehaviour
                 RemoveTile();
             }
         }
-        
+
+        else
+        {
+            Debug.Log("The time is ...");
+        }
+
+    }
+
+    private void CheckFirstClick()
+    {
+        Vector3 worldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        Vector3 gameCellPosition = gameBoard.tilemap.WorldToCell(worldPosition);
+        GameCells gameCell = GetCell((int)gameCellPosition.x, (int)gameCellPosition.y);
+
+        if (gameCell.type == GameCells.Type.Invalid || gameCell.revealed || gameCell.flagged)
+        {
+            return;
+        }
+
+        while (gameCell.type != GameCells.Type.Empty)
+        {
+            GenerateCells();
+            GenerateMines();
+            GenerateNumbers();
+            gameCell = GetCell((int)gameCellPosition.x, (int)gameCellPosition.y);
+        }
+        Flood(gameCell);
+        gameBoard.DrawMap(gameCells);
     }
 
     private void flag()
