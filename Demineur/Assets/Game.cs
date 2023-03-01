@@ -9,8 +9,8 @@ using UnityEngine;
 public class Game : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI textTime;
-
     [SerializeField] float currentTime;
+    [SerializeField] float timeRemaning;
     [SerializeField] bool timerIsRunning = false;
     private bool isFirstClick;
 
@@ -25,8 +25,6 @@ public class Game : MonoBehaviour
     private GameCells[,] gameCells;
 
     private bool gameOver;
-
-    public bool GameOver { get => gameOver; }
 
     private void Awake()
     {
@@ -73,6 +71,7 @@ public class Game : MonoBehaviour
     private void NewGame()
     {
         currentTime = 0;
+        timeRemaning = 50;
         isFirstClick = true;
         gameOver = false;
         gameCells = new GameCells[size, size];
