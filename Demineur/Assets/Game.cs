@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 
 public class Game : MonoBehaviour
@@ -27,6 +28,10 @@ public class Game : MonoBehaviour
     private bool gameOver;
 
     public bool GameOver { get => gameOver; }
+
+    public void GoBack(){
+         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
 
     private void Awake()
     {
@@ -67,7 +72,7 @@ public class Game : MonoBehaviour
         minutes = Mathf.FloorToInt(currentTime / 60);
         seconds = Mathf.FloorToInt(currentTime % 60);
         milliSeconds = (timeToDisplay % 1) * 1000;
-        textTime.text = string.Format("Tema kom t lent : {0:00}:{1:00}:{2:000}", minutes, seconds, milliSeconds);
+        textTime.text = string.Format("Timer : \n{0:00}:{1:00}:{2:000}", minutes, seconds, milliSeconds);
     }
 
     private void NewGame()
