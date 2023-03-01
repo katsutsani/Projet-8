@@ -77,11 +77,6 @@ public class Game : MonoBehaviour
         NewGame();
     }
 
-    public void Difficulty()
-    {
-
-    }
-
     public void DisplayTime(float timeToDisplay)
     {
         minutes = Mathf.FloorToInt(currentTime / 60);
