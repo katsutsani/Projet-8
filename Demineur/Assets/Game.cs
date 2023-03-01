@@ -15,6 +15,8 @@ public class Game : MonoBehaviour
     [SerializeField] bool timerIsRunning = false;
     private bool isFirstClick;
 
+    private bool isFirstClick;
+
     [SerializeField] float milliSeconds;
     [SerializeField] float minutes;
     [SerializeField] float seconds;
@@ -26,11 +28,25 @@ public class Game : MonoBehaviour
     private GameCells[,] gameCells;
 
     private bool gameOver;
-
     public bool GameOver { get => gameOver; }
 
-    public void GoBack(){
+    private GameMode gameMode;
+
+    public void GoBack()
+    {
          SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+    }
+
+    private void ChoiceMod()
+    {
+        if (PlayerPrefs.GetInt("Mode") == 0)
+        {
+            currentTime = 0;
+        }
+        else if (PlayerPrefs.GetInt("Mode") == 1)
+        {
+            currentTime = 5;
+        }
     }
 
     private void Awake()
@@ -45,20 +61,21 @@ public class Game : MonoBehaviour
             case "Easy":
                 size = 9;
                 MineCount = 10;
+                ChoiceMod();
                 break;
             case "Medium":
                 size = 16;
                 MineCount = 40;
+                ChoiceMod();
                 break;
             case "Hard":
                 size = 20;
                 MineCount = 99;
+                ChoiceMod();
                 break;
             default:
                 break;
         }
-        // Starts the timer automatically
-        timerIsRunning = true;
         NewGame();
     }
 
@@ -77,8 +94,6 @@ public class Game : MonoBehaviour
 
     private void NewGame()
     {
-        currentTime = 0;
-        timeRemaning = 50;
         isFirstClick = true;
         gameOver = false;
         gameCells = new GameCells[size, size];
@@ -189,7 +204,25 @@ public class Game : MonoBehaviour
         else if (!gameOver)
         {
             DisplayTime(currentTime);
-            currentTime += Time.deltaTime;
+
+            if (PlayerPrefs.GetInt("Mode") == 0)
+            {
+                currentTime += Time.deltaTime;
+            }
+            else if (PlayerPrefs.GetInt("Mode") == 1)
+            {
+                if (currentTime <= 0)
+                {
+                    gameOver= true;
+                    /*textTime.text = "Temps �coul�";*/
+                    Debug.Log("Time Over");
+                }
+                else
+                {
+                    currentTime -= Time.deltaTime;
+                }
+            }
+
             if (Input.GetMouseButtonDown(1))
             {
                 flag();
@@ -211,7 +244,6 @@ public class Game : MonoBehaviour
         else
         {
             Debug.Log("The time is ...");
-            timerIsRunning = false;
         }
 
     }
