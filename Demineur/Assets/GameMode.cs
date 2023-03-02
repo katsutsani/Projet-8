@@ -5,17 +5,12 @@ using UnityEngine.SceneManagement;
 
 public class GameMode : MonoBehaviour
 {
+    private void Awake()
+    {
+        PlayerPrefs.SetInt("Mode", 0);
+    }
     public void Mode(int mode)
     {
-        if(mode == 0)
-        {
-            // classique mode
-            PlayerPrefs.SetInt("Mode", mode);
-        }
-        else if(mode == 1)
-        {
-            // contre la montre
-            PlayerPrefs.SetInt("Mode", mode);
-        }
+        PlayerPrefs.SetInt("Mode", mode);
     }
 }

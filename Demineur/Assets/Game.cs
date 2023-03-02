@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     [SerializeField] TextMeshProUGUI textTime;
     [SerializeField] float currentTime;
     [SerializeField] float timeRemaning;
-    [SerializeField] bool timerIsRunning = false;
+
     private bool isFirstClick;
 
     [SerializeField] float milliSeconds;
@@ -37,13 +37,15 @@ public class Game : MonoBehaviour
 
     private void ChoiceMod()
     {
-        if (PlayerPrefs.GetInt("Mode") == 0)
+        if (PlayerPrefs.GetInt("Mode") == 1)
         {
-            currentTime = 0;
-        }
-        else if (PlayerPrefs.GetInt("Mode") == 1)
-        {
+            // contre la montre
             currentTime = 5;
+        }
+        else
+        {
+            // classique
+            currentTime = 0;
         }
     }
 
@@ -59,21 +61,19 @@ public class Game : MonoBehaviour
             case "Easy":
                 size = 9;
                 MineCount = 10;
-                ChoiceMod();
                 break;
             case "Medium":
                 size = 16;
                 MineCount = 40;
-                ChoiceMod();
                 break;
             case "Hard":
                 size = 20;
                 MineCount = 99;
-                ChoiceMod();
                 break;
             default:
                 break;
         }
+        ChoiceMod();
         NewGame();
     }
 
@@ -207,7 +207,7 @@ public class Game : MonoBehaviour
                 if (currentTime <= 0)
                 {
                     gameOver= true;
-                    /*textTime.text = "Temps �coul�";*/
+                    /*textTime.text = "Temps ecoule";*/
                     Debug.Log("Time Over");
                 }
                 else
