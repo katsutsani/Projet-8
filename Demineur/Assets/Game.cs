@@ -12,7 +12,7 @@ public class Game : MonoBehaviour
     [SerializeField] TextMeshProUGUI textTime;
     [SerializeField] float currentTime;
     [SerializeField] float timeRemaning;
-    [SerializeField] bool timerIsRunning = false;
+
     private bool isFirstClick;
 
     [SerializeField] float milliSeconds;
@@ -22,14 +22,16 @@ public class Game : MonoBehaviour
     public int size;
     public int MineCount;
 
+    [SerializeField] ElapsedTime elapsedTime;
+
     private GameBoard gameBoard;
     private GameCells[,] gameCells;
 
     private bool gameOver;
-
     public bool GameOver { get => gameOver; }
 
-    public void GoBack(){
+    public void GoBack()
+    {
          SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
     public void Pause()
@@ -44,31 +46,41 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        currentTime = 0;
+
         switch (PlayerPrefs.GetString("Difficulty"))
         {
             case "Easy":
                 size = 9;
                 MineCount = 10;
+                if (PlayerPrefs.GetInt("Mode") == 1)
+                {
+                    // contre la montre
+                    currentTime = 60;
+                }
                 break;
             case "Medium":
                 size = 16;
                 MineCount = 40;
+                if (PlayerPrefs.GetInt("Mode") == 1)
+                {
+                    // contre la montre
+                    currentTime = 90;
+                }
                 break;
             case "Hard":
                 size = 20;
                 MineCount = 99;
+                if (PlayerPrefs.GetInt("Mode") == 1)
+                {
+                    // contre la montre
+                    currentTime = 120;
+                }
                 break;
             default:
                 break;
         }
-        // Starts the timer automatically
-        timerIsRunning = true;
         NewGame();
-    }
-
-    public void Difficulty()
-    {
-
     }
 
     public void DisplayTime(float timeToDisplay)
@@ -81,8 +93,6 @@ public class Game : MonoBehaviour
 
     private void NewGame()
     {
-        currentTime = 0;
-        timeRemaning = 50;
         isFirstClick = true;
         gameOver = false;
         gameCells = new GameCells[size, size];
@@ -193,7 +203,25 @@ public class Game : MonoBehaviour
         else if (!gameOver)
         {
             DisplayTime(currentTime);
-            currentTime += Time.deltaTime;
+
+            if (PlayerPrefs.GetInt("Mode") == 0)
+            {
+                currentTime += Time.deltaTime;
+            }
+            else if (PlayerPrefs.GetInt("Mode") == 1)
+            {
+                if (currentTime <= 0)
+                {
+                    gameOver= true;
+                    elapsedTime.Enable();
+                    textTime.text = "Timer : \n00:00:00";
+                }
+                else
+                {
+                    currentTime -= Time.deltaTime;
+                }
+            }
+
             if (Input.GetMouseButtonDown(1))
             {
                 flag();
@@ -211,11 +239,6 @@ public class Game : MonoBehaviour
                     RemoveTile();
                 }
             }
-        }
-        else
-        {
-            Debug.Log("The time is ...");
-            timerIsRunning = false;
         }
 
     }
@@ -259,7 +282,7 @@ public class Game : MonoBehaviour
 
     private GameCells GetCell(int x, int y)
     {
-        if (isValid(x, y))
+        if (IsValid(x, y))
         {
             return gameCells[x, y];
         }
@@ -269,7 +292,7 @@ public class Game : MonoBehaviour
         }
     }
 
-    private bool isValid(int x, int y)
+    private bool IsValid(int x, int y)
     {
         return x >= 0 && x < size && y >= 0 && y < size;
     }
@@ -378,13 +401,4 @@ public class Game : MonoBehaviour
             Flood(GetCell(gameCell.position.x, gameCell.position.y + 1));
         }
     }
-
-    //private bool isATile(int x, int y)
-    //{
-    //    //if ()
-    //    //{
-
-    //    //}
-    //    return false;
-    //}
 }
