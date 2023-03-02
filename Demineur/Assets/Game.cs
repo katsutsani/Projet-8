@@ -22,31 +22,17 @@ public class Game : MonoBehaviour
     public int size;
     public int MineCount;
 
+    [SerializeField] ElapsedTime elapsedTime;
+
     private GameBoard gameBoard;
     private GameCells[,] gameCells;
 
     private bool gameOver;
     public bool GameOver { get => gameOver; }
 
-    private GameMode gameMode;
-
     public void GoBack()
     {
          SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
-    }
-
-    private void ChoiceMod()
-    {
-        if (PlayerPrefs.GetInt("Mode") == 1)
-        {
-            // contre la montre
-            currentTime = 5;
-        }
-        else
-        {
-            // classique
-            currentTime = 0;
-        }
     }
 
     private void Awake()
@@ -56,24 +42,40 @@ public class Game : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
+        currentTime = 0;
+
         switch (PlayerPrefs.GetString("Difficulty"))
         {
             case "Easy":
                 size = 9;
                 MineCount = 10;
+                if (PlayerPrefs.GetInt("Mode") == 1)
+                {
+                    // contre la montre
+                    currentTime = 2;
+                }
                 break;
             case "Medium":
                 size = 16;
                 MineCount = 40;
+                if (PlayerPrefs.GetInt("Mode") == 1)
+                {
+                    // contre la montre
+                    currentTime = 90;
+                }
                 break;
             case "Hard":
                 size = 20;
                 MineCount = 99;
+                if (PlayerPrefs.GetInt("Mode") == 1)
+                {
+                    // contre la montre
+                    currentTime = 120;
+                }
                 break;
             default:
                 break;
         }
-        ChoiceMod();
         NewGame();
     }
 
@@ -207,8 +209,8 @@ public class Game : MonoBehaviour
                 if (currentTime <= 0)
                 {
                     gameOver= true;
-                    /*textTime.text = "Temps ecoule";*/
-                    Debug.Log("Time Over");
+                    elapsedTime.Enable();
+                    textTime.text = "Timer : \n00:00:00";
                 }
                 else
                 {
@@ -233,10 +235,6 @@ public class Game : MonoBehaviour
                     RemoveTile();
                 }
             }
-        }
-        else
-        {
-            Debug.Log("The time is ...");
         }
 
     }
@@ -280,7 +278,7 @@ public class Game : MonoBehaviour
 
     private GameCells GetCell(int x, int y)
     {
-        if (isValid(x, y))
+        if (IsValid(x, y))
         {
             return gameCells[x, y];
         }
@@ -290,7 +288,7 @@ public class Game : MonoBehaviour
         }
     }
 
-    private bool isValid(int x, int y)
+    private bool IsValid(int x, int y)
     {
         return x >= 0 && x < size && y >= 0 && y < size;
     }
@@ -399,13 +397,4 @@ public class Game : MonoBehaviour
             Flood(GetCell(gameCell.position.x, gameCell.position.y + 1));
         }
     }
-
-    //private bool isATile(int x, int y)
-    //{
-    //    //if ()
-    //    //{
-
-    //    //}
-    //    return false;
-    //}
 }
