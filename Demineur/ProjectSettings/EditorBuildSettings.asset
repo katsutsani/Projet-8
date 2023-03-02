@@ -9,9 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/GameMenu.unity
     guid: 23fa1166ae53dfd47924ba89e6a3c73f
   - enabled: 1
-    path: Assets/Scenes/Difficulty.unity
-    guid: 09c831e6da1680941aab209f6482928f
-  - enabled: 1
     path: Assets/Scenes/Tiles.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1

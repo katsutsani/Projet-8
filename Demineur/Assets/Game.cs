@@ -34,6 +34,10 @@ public class Game : MonoBehaviour
     {
          SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
     }
+    public void Pause()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 2);
+    }
 
     private void Awake()
     {
