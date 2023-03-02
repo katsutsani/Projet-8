@@ -56,7 +56,7 @@ public class Game : MonoBehaviour
                 if (PlayerPrefs.GetInt("Mode") == 1)
                 {
                     // contre la montre
-                    currentTime = 2;
+                    currentTime = 60;
                 }
                 break;
             case "Medium":
