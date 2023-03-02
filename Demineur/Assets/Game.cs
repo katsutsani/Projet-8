@@ -65,7 +65,7 @@ public class Game : MonoBehaviour
                 if (PlayerPrefs.GetInt("Mode") == 1)
                 {
                     // contre la montre
-                    currentTime = 90;
+                    currentTime = 120;
                 }
                 break;
             case "Hard":
@@ -74,7 +74,7 @@ public class Game : MonoBehaviour
                 if (PlayerPrefs.GetInt("Mode") == 1)
                 {
                     // contre la montre
-                    currentTime = 120;
+                    currentTime = 180;
                 }
                 break;
             default:
